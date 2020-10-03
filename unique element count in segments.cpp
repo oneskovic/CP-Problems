@@ -38,14 +38,6 @@ struct query_element
 	}
 };
 
-vector<int> rand_vector(int n, int max_element)
-{
-	vector<int> v(n);
-	for (size_t i = 0; i < n; i++)
-		v[i] = rand() % (max_element+1);
-	return v;
-}
-
 int main()
 {
 	ios::sync_with_stdio(false);
