@@ -42,12 +42,10 @@ int main()
 {
 	ios::sync_with_stdio(false);
 	cin.tie(0);
-	srand(time(0));
 	int n; cin >> n;
 	vector<int> elements(n);
 	for (size_t i = 0; i < n; i++)
 		cin >> elements[i];
-	//auto elements = rand_vector(n, 100000);
 
 
 	// We will, for each element remember the next position it appears (or MAX_INT if it doesnt appear again)
@@ -72,7 +70,7 @@ int main()
 	// First combine all queries and next_position elements into a single vector (query_elements)
 	// Sort according to the element value (in non-increasing order) - if the element is a query compare to r
 	// The point of this is to process a query only once the larger elements have been added
-	int no_queries;cin >> no_queries;
+	int no_queries; cin >> no_queries;
 	vector<query_element> query_elements; query_elements.reserve(n + no_queries);
 	// Add queries
 	for (size_t i = 0; i < no_queries; i++)
@@ -139,8 +137,8 @@ void SegmentTree::Modify(int position, int new_value)
 {
 	position += element_count;
 	tree[position] = new_value;
-	for (int i = position / 2; i > 0; i--)
-		tree[i] = tree[i*2] + tree[i*2 + 1];
+	for (int i = position / 2; i > 0; i /= 2)
+		tree[i] = tree[i * 2] + tree[i * 2 + 1];
 }
 
 ll SegmentTree::Query(int l, int r)

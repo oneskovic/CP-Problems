@@ -29,7 +29,7 @@ void SegmentTree::Modify(int position, ll new_value)
 {
 	position += element_count;
 	tree[position] = new_value;
-	for (int i = position / 2; i > 0; i--)
+	for (int i = position / 2; i > 0; i/=2)
 		tree[i] = tree[i * 2] + tree[i * 2 + 1];
 }
 
