@@ -47,7 +47,6 @@ int main()
 	for (size_t i = 0; i < n; i++)
 		cin >> elements[i];
 
-
 	// We will, for each element remember the next position it appears (or MAX_INT if it doesnt appear again)
 	// Eg. for elements [1,2,3,2,1] remember [4,3,MAX_INT,MAX_INT,MAX_INT]
 	unordered_map<int, int> previous_position;
