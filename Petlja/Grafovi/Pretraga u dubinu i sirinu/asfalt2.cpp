@@ -11,7 +11,6 @@ using namespace std;
 
 vector<int> node, next_node;
 vector<int> should_delete;
-vector<vector<int>> node_positions;
 vector<vector<int>> strong_edges, weak_edges;
 vector<bool> finished_node, enetered_node;
 
@@ -49,7 +48,6 @@ void dfs(int parent, int current_node)
 		{
 			node.push_back(current_node);
 			next_node.push_back(neighbor);
-			node_positions[current_node].push_back(node.size() - 1);
 			dfs(current_node, neighbor);
 		}
 	}
@@ -58,7 +56,6 @@ void dfs(int parent, int current_node)
 	{
 		node.push_back(current_node);
 		next_node.push_back(-1);
-		node_positions[current_node].push_back(node.size() - 1);
 	}
 
 	finished_node[current_node] = true;
@@ -89,7 +86,6 @@ int main()
 		}
 	}
 	
-	node_positions = vector<vector<int>>(node_count + 1, vector<int>());
 	finished_node = vector<bool>(node_count + 1);
 	enetered_node = finished_node;
 	should_delete = vector<int>(node_count + 1, DO_NOT_DELETE);
