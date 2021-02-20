@@ -122,13 +122,12 @@ int main()
 		}
 	}
 
-	for (size_t i = 0; i < node.size(); i++)
-		if (should_delete[node[i]] == DO_NOT_DELETE)
-			solution.push_back(node[i]);
+	for (size_t i = 1; i <= node_count; i++)
+		if (should_delete[i] == DO_NOT_DELETE)
+			solution.push_back(i);
 
 	sort(solution.begin(), solution.end());
-	solution.erase(unique(solution.begin(), solution.end()),solution.end());
-
+	
 	cout << solution.size() << "\n";
 	for (int i: solution)
 		cout << i << " ";
