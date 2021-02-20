@@ -52,12 +52,6 @@ void dfs(int parent, int current_node)
 		}
 	}
 
-	if (strong_edges[current_node].size() == 1)
-	{
-		node.push_back(current_node);
-		next_node.push_back(-1);
-	}
-
 	finished_node[current_node] = true;
 }
 
