@@ -98,15 +98,13 @@ ll Trie::largest_xor(ll number)
 		}
 		number_to_xor <<= 1;
 	}
+
 	bool current_bit = mask & number;
 	if (current_node->children[!current_bit] != nullptr)
-	{
 		number_to_xor |= (!current_bit);
-	}
 	else
-	{
 		number_to_xor |= current_bit;
-	}
+	
 	return number ^ number_to_xor;
 }
 
