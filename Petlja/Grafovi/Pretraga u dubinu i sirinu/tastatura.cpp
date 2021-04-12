@@ -4,8 +4,6 @@
 #include <vector>
 #include <queue>
 #include <map>
-#include <random>
-#include <chrono>
 using namespace std;
 #define ll long long
 
@@ -44,11 +42,12 @@ vector<cell> get_neighbors(int row, int col, const vector<vector<int>>& keyboard
 	vector<int> dcol = { 1,-1,0,0 };
 	vector<cell> neighbors;
 
+	int current_row = row;
+	int current_col = col;
+
 	int col_count = keyboard[0].size();
 	for (int i = 0; i < drow.size(); i++)
 	{
-		int current_row = row;
-		int current_col = col;
 		int new_row = current_row + drow[i];
 		int new_col = current_col + dcol[i];
 		while (is_valid_cell(new_row, new_col, keyboard.size(), keyboard[0].size()) && keyboard[new_row][new_col] == keyboard[current_row][current_col])
@@ -68,6 +67,8 @@ vector<cell> get_neighbors(int row, int col, const vector<vector<int>>& keyboard
 			int index = current_row * col_count + current_col;
 			neighbors.push_back({index,keyboard[current_row][current_col]});
 		}
+		current_row = row;
+		current_col = col;
 	}
 	return neighbors;
 }
@@ -96,40 +97,89 @@ vector<ll> shortest_paths(cell source_node, const vector<vector<cell>>& graph)
 	return computed_path;
 }
 
-ll dijkstra(int source, int dest, const map<int,vector<int>>& graph, const map<int,vector<ll>>& weights)
+void debug_print(const vector<vector<int>>& dp, int pos)
 {
-	map<int, ll> computed_paths;
-	priority_queue <pair<ll, int>, vector<pair<ll,int>>, greater<pair<ll,int>> > distance_node;
-	computed_paths[source] = 0;
-	distance_node.emplace(0, source);
-
-	while (!distance_node.empty())
+	int n = 5, m = 5;
+	for (int i = 0; i < n; i++)
 	{
-		ll current_dist = distance_node.top().first;
-		int current_node = distance_node.top().second;
-		distance_node.pop();
-		if (current_node == dest)
-			break;
-			
-		if (graph.find(current_node) == graph.end() || computed_paths[current_node] < current_dist)
-			continue;
-		
-		for (int i = 0; i < graph.at(current_node).size(); i++)
+		for (int j = 0; j < m; j++)
 		{
-			int neighbor = graph.at(current_node).at(i);
-			ll w = weights.at(current_node).at(i);
-			if (computed_paths.find(neighbor) == computed_paths.end() || current_dist + w < computed_paths[neighbor])
-			{
-				computed_paths[neighbor] = current_dist + w;
-				distance_node.emplace(current_dist + w, neighbor);
-			}
+			int index = i * m + j;
+			cout << dp[index][pos] << " ";
+		}
+		cout << "\n";
+	}
+}
+
+ll solve(const vector<int>& str_to_find, const vector<vector<cell>>& graph, const vector<vector<int>>& k)
+{
+	vector<vector<ll>> shortest_path_from_to(graph.size(), vector<ll>());
+	for (int i = 0; i < graph.size(); i++)
+		shortest_path_from_to[i] = shortest_paths({ i,-1 }, graph);
+
+	vector<vector<int>> indices_with_chr (27, vector<int>());
+	vector<int> keyboard(k.size() * k[0].size());
+	for (int row = 0; row < k.size(); row++)
+	{
+		for (int col = 0; col < k[0].size(); col++)
+		{
+			int index = row * k[0].size() + col;
+			keyboard[index] = k[row][col];
+			indices_with_chr[k[row][col]].push_back(index);
 		}
 	}
-	if (computed_paths.find(dest) == computed_paths.end())
+
+	vector<vector<ll>> dp(graph.size(), vector<ll>(str_to_find.size(), -1));
+
+	for (int i = 0; i < dp.size(); i++)
 	{
-		return LLONG_MAX;
+		dp[i][0] = shortest_path_from_to[0][i];
 	}
-	return computed_paths[dest];
+	//debug_print(dp, 0);
+	
+	for (int pos_in_str = 1; pos_in_str < str_to_find.size(); pos_in_str++)
+	{
+		for (int i = 0; i < graph.size(); i++)
+		{
+			if (dp[i][pos_in_str-1] == -1)
+			{
+				continue;
+			}
+			if (keyboard[i] == str_to_find[pos_in_str])
+			{
+				if (dp[i][pos_in_str-1] == -1)
+					dp[i][pos_in_str] = -1;
+				else
+					dp[i][pos_in_str] = dp[i][pos_in_str - 1];
+			}
+			else
+			{
+				ll min_over_all_neighbors = LLONG_MAX;
+				for (int neighbor: indices_with_chr[str_to_find[pos_in_str]])
+				{
+					if (dp[neighbor][pos_in_str - 1] > -1)
+					{
+						min_over_all_neighbors = min(min_over_all_neighbors, dp[neighbor][pos_in_str - 1] + shortest_path_from_to[neighbor][i]);
+					}
+				}
+				if (min_over_all_neighbors == LLONG_MAX)
+					dp[i][pos_in_str] = -1;
+				else
+					dp[i][pos_in_str] = min_over_all_neighbors;
+			}
+		}
+		//debug_print(dp, pos_in_str);
+	}
+
+	ll solution = INT_MAX;
+	for (int i = 0; i < graph.size(); i++)
+	{
+		if (keyboard[i] == 26 && dp[i].back() > -1)
+		{
+			solution = min(solution, dp[i].back());
+		}
+	}
+	return solution;
 }
 
 int main()
@@ -161,50 +211,8 @@ int main()
 		}
 	}
 
-	vector<vector<int>> indices_with_chr(27, vector<int>());
-	for (int row = 0; row < keyboard.size(); row++)
-	{
-		for (int col = 0; col < keyboard[0].size(); col++)
-		{
-			int index = row * keyboard[0].size() + col;
-			indices_with_chr[keyboard[row][col]].push_back(index);
-		}
-	}
-
-	vector<vector<ll>> shortest_path_from_to(graph.size(), vector<ll>());
-	for (int i = 0; i < graph.size(); i++)
-		shortest_path_from_to[i] = shortest_paths({ i,-1 }, graph);
-
 	string str_to_type; cin >> str_to_type;
-	auto vec_to_type = str_to_vector_int(str_to_type+"*");
-	map<int,vector<int>> new_graph;
-	map<int,vector<ll>> new_weights;
-	for (size_t i = 0; i < vec_to_type.size() - 1; i++)
-	{
-		for (int current_node: indices_with_chr[vec_to_type[i]])
-		{
-			for (int next_node: indices_with_chr[vec_to_type[i+1]])
-			{
-				if (shortest_path_from_to[current_node][next_node] < LLONG_MAX)
-				{
-					new_graph[current_node+i*graph.size()].push_back(next_node+(i+1)*graph.size());
-					new_weights[current_node+i*graph.size()].push_back(shortest_path_from_to[current_node][next_node]);
-				}
-			}
-		}
-	}
-	for (int next_node: indices_with_chr[vec_to_type[0]])
-	{
-		new_graph[0].push_back(next_node);
-		new_weights[0].push_back(shortest_path_from_to[0][next_node]);
-	}
-
-	ll solution = LLONG_MAX;
-	for (int possible_dest: indices_with_chr[26])
-	{
-		int dest_index = graph.size() * (vec_to_type.size() - 1) + possible_dest;
-		solution = min(solution, dijkstra(0, dest_index, new_graph, new_weights));
-	}
-	cout << solution + str_to_type.size() + 1;
+	auto vec_to_type = str_to_vector_int("A"+str_to_type+"*");
+	cout << solve(vec_to_type, graph, keyboard) + str_to_type.size()+1;
 	return 0;
 }
