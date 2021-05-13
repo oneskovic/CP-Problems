@@ -14,10 +14,7 @@ int main()
 	int pocetno_praznih = broj_placeva - broj_brace * duzina_kuce;
 	int pocetno_kuca = broj_brace;
 	// dp[i][j] -> f(smesteno_kuca,smesteno_praznih)
-	vector<vector<ll>> dp(2);
-	for (size_t i = 0; i < 2; i++)
-		dp[i] = vector<ll>(pocetno_praznih+1);
-	
+	vector<vector<ll>> dp(2, vector<ll>(pocetno_praznih+1));
 
 	vector<ll> vrednosti(broj_placeva);
 	for (size_t i = 0; i < broj_placeva; i++)
