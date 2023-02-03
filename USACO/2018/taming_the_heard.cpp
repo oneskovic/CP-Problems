@@ -29,7 +29,7 @@ void print_vec(const vector<vector<int>>& v)
 
 int main()
 {
-    freopen("taming.in", "r", stdin);
+    	freopen("taming.in", "r", stdin);
 	freopen("taming.out", "w", stdout);
 	ios::sync_with_stdio(false);
 	cin.tie(0);
