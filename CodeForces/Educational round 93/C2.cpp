@@ -26,6 +26,7 @@ int main()
 			prefix_diff_cnt[current_prefix - (i + 1)]++;
 		}
 		ll solution = 0;
+
 		for (auto kvp : prefix_diff_cnt)
 			solution += (ll)kvp.second * (kvp.second - 1) / 2;
 		
